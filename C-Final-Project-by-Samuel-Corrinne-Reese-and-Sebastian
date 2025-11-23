@@ -1,0 +1,128 @@
+using System;
+using System.Collections.Generic;
+
+// Base class representing a general contractor 
+// Compiled by: Sebastian Rengifo
+public class Contractor
+{
+    public string Name { get; set; }
+    public int ID { get; set; }
+    public string StartDate { get; set; }
+
+    // Constructor - Sebastian Rengifo
+    public Contractor(string name, int id, string startDate)
+    {
+        Name = name;
+        ID = id;
+        StartDate = startDate;
+    }
+
+    // Display contractor info - Sebastian Rengifo
+    public virtual void DisplayInfo()
+    {
+        Console.WriteLine($"Contractor Name: {Name}, ID: {ID}, Start Date: {StartDate}");
+    }
+}
+
+// Derived class representing a subcontractor 
+// Compiled by: Sam Lobl & Sebastian Rengifo
+public class Subcontractor : Contractor
+{
+    private double hourlyRate; // Hourly pay rate
+    private int shift;         // 1 = Day, 2 = Night
+
+    // Constructor - Sam Lobl
+    public Subcontractor(string name, int id, string startDate, double hourlyRate, int shift)
+        : base(name, id, startDate)
+    {
+        this.hourlyRate = hourlyRate;
+        this.shift = shift;
+    }
+
+    // Accessors - Sebastian Rengifo
+    public double HourlyRate
+    {
+        get { return hourlyRate; }
+        set { hourlyRate = value; }
+    }
+
+    public int Shift
+    {
+        get { return shift; }
+        set { shift = value; }
+    }
+
+    // Calculate pay with 3% night shift differential - Sam Lobl
+    public float CalculatePay(float hoursWorked)
+    {
+        double rate = hourlyRate;
+        if (shift == 2) rate *= 1.03; // 3% night shift differential
+        return (float)(rate * hoursWorked);
+    }
+
+    // Display subcontractor info - Sebastian Rengifo
+    public override void DisplayInfo()
+    {
+        base.DisplayInfo();
+        string shiftName = shift == 1 ? "Day" : "Night";
+        Console.WriteLine($"Hourly Rate: ${hourlyRate:F2}, Shift: {shiftName}");
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        // Main program compiled by: Corrinne Whitt
+        List<Subcontractor> subcontractors = new List<Subcontractor>();
+        string input;
+
+        do
+        {
+            Console.Write("Enter subcontractor name: ");
+            string name = Console.ReadLine();
+
+            Console.Write("Enter ID: ");
+            int id = int.Parse(Console.ReadLine());
+
+            Console.Write("Enter start date (MM/DD/YYYY): ");
+            string startDate = Console.ReadLine();
+
+            Console.Write("Enter hourly rate: ");
+            double rate = double.Parse(Console.ReadLine());
+
+            Console.Write("Enter shift (1 for Day, 2 for Night): ");
+            int shift = int.Parse(Console.ReadLine());
+
+            Subcontractor sc = new Subcontractor(name, id, startDate, rate, shift);
+            subcontractors.Add(sc);
+
+            Console.Write("Add another subcontractor? (y/n): ");
+            input = Console.ReadLine().ToLower();
+
+        } while (input == "y");
+
+        Console.WriteLine("\n--- Subcontractor Details ---");
+        float totalPay = 0;
+        int count = 0;
+
+        foreach (var sc in subcontractors)
+        {
+            sc.DisplayInfo();
+            Console.Write("Enter hours worked: ");
+            float hours = float.Parse(Console.ReadLine());
+            float pay = sc.CalculatePay(hours);
+            Console.WriteLine($"Calculated Pay: ${pay:F2}\n");
+
+            totalPay += pay;
+            count++;
+        }
+
+        // Addition by Corrinne Whitt:
+        // Show average pay across all subcontractors
+        if (count > 0)
+        {
+            Console.WriteLine($"Average Pay across all subcontractors: ${totalPay / count:F2}");
+        }
+    }
+}
